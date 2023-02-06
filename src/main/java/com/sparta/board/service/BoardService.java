@@ -17,7 +17,7 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<Board> getBoard(){
-        return boardRepository.findAllByOrderByModifiedAtDesc();
+        return boardRepository.findAllByOOrderByCreatedAtDesc();
     }
     @Transactional
     public Board addBoard(BoardRequestDto boardRequestDto) {
