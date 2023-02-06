@@ -19,6 +19,11 @@ public class BoardService {
     public List<Board> getBoard(){
         return boardRepository.findAllByOrderByCreatedAtDesc();
     }
+
+    public Board getIdBoard(Long id) {
+        Board board = boardRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("해당 글이 없습니다"));
+        return board;
+    }
     @Transactional
     public Board addBoard(BoardRequestDto boardRequestDto) {
         Board board = new Board(boardRequestDto);
@@ -63,4 +68,6 @@ public class BoardService {
         boardRepository.delete(board);
         return "삭제 완료";
     }
+
+
 }
