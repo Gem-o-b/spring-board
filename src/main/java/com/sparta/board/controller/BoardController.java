@@ -1,5 +1,6 @@
 package com.sparta.board.controller;
 
+import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.dto.BoardRequestDto;
 import com.sparta.board.service.BoardService;
@@ -24,12 +25,12 @@ public class BoardController {
     }
 
     @GetMapping("api/get")
-    public List<Board> getBoard(){
+    public List<BoardResponseDto> getBoard(){
         return boardService.getBoard();
     }
 
     @GetMapping("api/get/{id}")
-    public Board getIdBoard(@PathVariable Long id){
+    public BoardResponseDto getIdBoard(@PathVariable Long id){
         return boardService.getIdBoard(id);
     }
 

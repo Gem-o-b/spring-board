@@ -1,5 +1,6 @@
 package com.sparta.board.service;
 
+import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.dto.BoardRequestDto;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,13 +18,18 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional(readOnly = true)
-    public List<Board> getBoard(){
-        return boardRepository.findAllByOrderByCreatedAtDesc();
+    public List<BoardResponseDto> getBoard(){
+        List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc();
+        List<BoardResponseDto> boardResponseDtos = board.stream()
+                .map(BoardResponseDto::new)
+                .collect(Collectors.toList());
+        return boardResponseDtos ;
     }
 
-    public Board getIdBoard(Long id) {
+    public BoardResponseDto getIdBoard(Long id) {
         Board board = boardRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("해당 글이 없습니다"));
-        return board;
+
+        return new BoardResponseDto(board);
     }
     @Transactional
     public Board addBoard(BoardRequestDto boardRequestDto) {
