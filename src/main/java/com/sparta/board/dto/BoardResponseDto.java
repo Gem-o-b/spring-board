@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public class BoardResponseDto {
+    private Long id ;
     private String title;
     private String userName;
     private String content;
@@ -14,6 +15,7 @@ public class BoardResponseDto {
     private LocalDateTime createdAt;
 
     public BoardResponseDto(Board board) {
+        this.id = board.getId();
         this.title = board.getTitle();
         this.userName = board.getUserName();
         this.content = board.getContent();

@@ -39,6 +39,11 @@ public class BoardController {
         return boardService.updateBoard(id,boardRequestDto);
     }
 
+   /* @PutMapping("api/update/{id}")
+    public BoardResponseDto updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto){
+        return boardService.updateBoard(id,boardRequestDto);
+    }*/
+
     @PostMapping("api/delete/{id}")
     public String deleteBoard(@PathVariable Long id ,@RequestBody BoardRequestDto boardRequestDto){
 
