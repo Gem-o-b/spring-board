@@ -4,6 +4,11 @@
 ### 게시판 만들기 ( Java Spring CRUD구현 )
 - - - 
 
+#### 유스케이스
+![유스케이스](https://user-images.githubusercontent.com/111578825/217434153-27583d88-e9b4-4bb1-809e-f9d61c055b3c.png)
+
+- - -
+
 #### api명세서
 
 
