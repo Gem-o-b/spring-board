@@ -1,6 +1,6 @@
 package com.sparta.board.entity;
 
-import com.sparta.board.dto.MemberRequestDto;
+import com.sparta.board.dto.UserRequestDto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,10 +11,10 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Member {
+public class Users {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -27,9 +27,9 @@ public class Member {
     List<Board> boards = new ArrayList<>();
 
 
-    public Member(MemberRequestDto memberRequestDto) {
-        this.username = memberRequestDto.getUsername();
-        this.password = memberRequestDto.getPassword();
+    public Users(UserRequestDto userRequestDto) {
+        this.username = userRequestDto.getUsername();
+        this.password = userRequestDto.getPassword();
     }
 
 

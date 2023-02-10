@@ -1,18 +1,16 @@
 package com.sparta.board.dto;
 
-import com.sparta.board.entity.Member;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 @Getter
-public class MemberResponseDto {
+public class UserResponseDto {
 
 
     private String msg ;
     private int statusCode;
 
 
-    public MemberResponseDto(String msg, int statusCode) {
+    public UserResponseDto(String msg, int statusCode) {
         this.msg = msg;
         this.statusCode =  statusCode;
 

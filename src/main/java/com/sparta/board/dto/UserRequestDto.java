@@ -2,7 +2,6 @@ package com.sparta.board.dto;
 
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -10,7 +9,7 @@ import javax.validation.constraints.Size;
 
 @Getter
 
-public class MemberRequestDto {
+public class UserRequestDto {
 
     @NotBlank
     @Size(min = 4, max = 10)

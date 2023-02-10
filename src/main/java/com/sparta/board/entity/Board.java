@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class Board extends Timestamped{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -28,11 +28,12 @@ public class Board extends Timestamped{
 
 
 
-    public Board(BoardRequestDto boardRequestDto) {
+
+    public Board(BoardRequestDto boardRequestDto,String memberName) {
         this.title = boardRequestDto.getTitle();
-        this.userName = boardRequestDto.getUserName();
         this.content = boardRequestDto.getContent();
         this.password = boardRequestDto.getPassword();
+        this.userName = memberName;
     }
 
     public void update(BoardRequestDto boardRequestDto) {

@@ -1,5 +1,6 @@
 package com.sparta.board.controller;
 
+import com.sparta.board.dto.BoardAddResponseDto;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.dto.BoardRequestDto;
@@ -7,6 +8,7 @@ import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,9 +18,9 @@ public class BoardController {
 
     private final BoardService boardService;
     @PostMapping("/api/post")
-    public Board addBoard(@RequestBody BoardRequestDto boardRequestDto){
+    public BoardAddResponseDto addBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
 
-        return boardService.addBoard(boardRequestDto);
+        return boardService.addBoard(boardRequestDto,request);
 
     }
 
