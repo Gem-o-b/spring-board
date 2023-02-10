@@ -50,14 +50,7 @@ public class BoardService {
         return "저장 완료";
 
     }
- /* @Transactional
-    public BoardResponseDto updateBoard(Long id, BoardRequestDto boardRequestDto) {
-        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("자료가 없습니다"));
-        if (!board.getPassword().equals(boardRequestDto.getPassword())) {
-        }
-        board.update(boardRequestDto);
-        return new BoardResponseDto(board);
-    }*/
+
     @Transactional
     public String deleteBoard(Long id, BoardRequestDto boardRequestDto) {
         Board board = boardRepository.findById(id).orElseThrow(
@@ -71,18 +64,27 @@ public class BoardService {
         return "삭제 완료";
 
     }
-
-    @Transactional
-    public String deleteBoard2(Long id, String password) {
-        Board board = boardRepository.findById(id).orElseThrow(
-                ()-> new IllegalArgumentException("자료가 없습니다")
-        );
-        if(!board.getPassword().equals(password)){
-            return "잘못된 패스워드 입니다";
+ /* @Transactional
+    public BoardResponseDto updateBoard(Long id, BoardRequestDto boardRequestDto) {
+        Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("자료가 없습니다"));
+        if (!board.getPassword().equals(boardRequestDto.getPassword())) {
         }
-        boardRepository.delete(board);
-        return "삭제 완료";
-    }
+        board.update(boardRequestDto);
+        return new BoardResponseDto(board);
+    }*/
 
+
+//    @Transactional
+//    public String deleteBoard2(Long id, String password) {
+//        Board board = boardRepository.findById(id).orElseThrow(
+//                ()-> new IllegalArgumentException("자료가 없습니다")
+//        );
+//        if(!board.getPassword().equals(password)){
+//            return "잘못된 패스워드 입니다";
+//        }
+//        boardRepository.delete(board);
+//        return "삭제 완료";
+//    }
+//
 
 }

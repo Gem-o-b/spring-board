@@ -26,6 +26,8 @@ public class Board extends Timestamped{
     @Column(nullable = false)
     private String password;
 
+
+
     public Board(BoardRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
         this.userName = boardRequestDto.getUserName();
