@@ -10,6 +10,15 @@
 
 - - -
 
+#### ERD
+![ERD](https://user-images.githubusercontent.com/111578825/218043552-bbfbf416-3b2a-46c4-8431-210926db764e.png)
+
+
+
+- - -
+
+
+
 #### api명세서
 
 
