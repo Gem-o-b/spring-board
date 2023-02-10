@@ -5,7 +5,8 @@
 - - - 
 
 #### 유스케이스
-![유스케이스](https://user-images.githubusercontent.com/111578825/217434153-27583d88-e9b4-4bb1-809e-f9d61c055b3c.png)
+![유스케이스_과제2](https://user-images.githubusercontent.com/111578825/218037858-2be7054b-bb3a-4e86-b2bf-d844f860cfc8.png)
+
 
 - - -
 
