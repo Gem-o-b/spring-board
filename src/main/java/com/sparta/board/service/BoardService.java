@@ -10,6 +10,7 @@ import com.sparta.board.dto.BoardRequestDto;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,13 +79,45 @@ public class BoardService {
 
     }
     @Transactional
-    public String updateBoard(Long id, BoardRequestDto boardRequestDto) {
-        Board board = boardRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("자료가 없습니다"));
-        if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
-            return "잘못된 패스워드 입니다";
+    public BoardResponseDto updateBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
+        // Request에서 Token 가져오기
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        // 토큰이 있는 경우에만 관심상품 최저가 업데이트 가능
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
+                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
+            );
+
+            board.update(boardRequestDto);
+
+            return new BoardResponseDto(board);
+
+        } else {
+            return null;
         }
-        board.update(boardRequestDto);
-        return "저장 완료";
+
+//
+//        Board board = boardRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("자료가 없습니다"));
+//        if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
+//            return "잘못된 패스워드 입니다";
+//        }
+//        board.update(boardRequestDto);
+//        return "저장 완료";
 
     }
 
@@ -93,10 +126,10 @@ public class BoardService {
         Board board = boardRepository.findById(id).orElseThrow(
                 ()-> new IllegalArgumentException("자료가 없습니다")
         );
-        if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
+    /*    if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
             return "잘못된 패스워드 입니다";
         }
-
+*/
         boardRepository.delete(board);
         return "삭제 완료";
 

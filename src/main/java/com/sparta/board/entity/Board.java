@@ -23,22 +23,22 @@ public class Board extends Timestamped{
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
-    private String password;
+/*    @Column(nullable = false)
+    private String password;*/
 
-
+//    @ManyToOne
+//    Users user = new Users();
 
 
     public Board(BoardRequestDto boardRequestDto,String memberName) {
         this.title = boardRequestDto.getTitle();
         this.content = boardRequestDto.getContent();
-        this.password = boardRequestDto.getPassword();
+//        this.password = boardRequestDto.getPassword();
         this.userName = memberName;
     }
 
     public void update(BoardRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
-        this.userName = boardRequestDto.getUserName();
         this.content = boardRequestDto.getContent();
     }
 }

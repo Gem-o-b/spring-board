@@ -17,28 +17,28 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
-    @PostMapping("/api/post")
+    @PostMapping("/api/post") // 추가
     public BoardAddResponseDto addBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
 
         return boardService.addBoard(boardRequestDto,request);
 
     }
 
-    @GetMapping("api/posts")
+    @GetMapping("api/posts") // 전체 조회
     public List<BoardResponseDto> getBoard(){
         return boardService.getBoard();
     }
 
-    @GetMapping("api/post/{id}")
+    @GetMapping("api/post/{id}") // 특정 글 조회
     public BoardResponseDto getIdBoard(@PathVariable Long id){
         return boardService.getIdBoard(id);
     }
 
-    @PutMapping("api/post/{id}")
-    public String updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto){
-        return boardService.updateBoard(id,boardRequestDto);
+    @PutMapping("api/post/{id}") // 수정
+    public BoardResponseDto updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
+        return boardService.updateBoard(id,boardRequestDto, request);
     }
-    @DeleteMapping("api/post/{id}")
+    @DeleteMapping("api/post/{id}") // 삭제
     public String deleteBoard2(@PathVariable Long id ,@RequestBody BoardRequestDto boardRequestDto){
 
         return boardService.deleteBoard(id, boardRequestDto);
