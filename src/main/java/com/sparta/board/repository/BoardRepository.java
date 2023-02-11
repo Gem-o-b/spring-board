@@ -12,5 +12,6 @@ public interface BoardRepository extends JpaRepository<Board,Long> {
         List<Board> findAllByOrderByModifiedAtDesc();
         List<Board> findAllByOrderByCreatedAtDesc();
 
-        Optional<Board> findByIdAndUserName(Long id, String username);
+//        Optional<Board> findByIdAndUserName(Long id, String username);
+        Optional<Board> findByIdAndUsersId(Long id, Long usersid);
 }

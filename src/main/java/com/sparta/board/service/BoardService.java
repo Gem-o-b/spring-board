@@ -1,13 +1,10 @@
 package com.sparta.board.service;
 
-import com.sparta.board.dto.BoardAddResponseDto;
-import com.sparta.board.dto.BoardResponseDto;
-import com.sparta.board.dto.UserResponseDto;
+import com.sparta.board.dto.*;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Users;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
-import com.sparta.board.dto.BoardRequestDto;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,6 +32,13 @@ public class BoardService {
     @Transactional(readOnly = true)
     public List<BoardResponseDto> getBoard(){ // BoardResponseDto형식의 리스트로 리턴
         List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc(); // board리스트형으로 Repo에서 생성일 순으로 리턴
+
+     /*   List<BoardResponseDto> boardResponseDtos = new ArrayList<>(); // Stream으로 안할경우
+
+        for(Board boards : board){
+            boardResponseDtos.add(new BoardResponseDto(boards));
+        }*/
+
         List<BoardResponseDto> boardResponseDtos = board.stream() //Board형의 리스트를 boardResponseDto형으로 변경하기 위해 Stream사용
                 .map(BoardResponseDto::new)
                 .collect(Collectors.toList());
@@ -65,7 +71,7 @@ public class BoardService {
             );
 
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
-            Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, users.getUsername()));
+            Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, users));
 
 //            return new ProductResponseDto(product);
             return new BoardAddResponseDto(board);
@@ -102,7 +108,8 @@ public class BoardService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
+//            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
+            Board board = boardRepository.findByIdAndUsersId(id, user.getId()).orElseThrow(
                     () -> new NullPointerException("해당 글은 존재하지 않습니다.")
             );
 
@@ -143,11 +150,24 @@ public class BoardService {
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
             );
 
-            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
-                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
-            );
+//            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
+//                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
+//            );
+            Optional<Board> board = boardRepository.findByIdAndUsersId(id, user.getId());
+            if(board.isEmpty()){
+//                return ResponseEntity.badRequest().body(new UserResponseDto("본인의 글만 삭제 가능합니다",HttpStatus.BAD_REQUEST.value()));
+                //빌더패턴 적용
+                return ResponseEntity.badRequest().body( 
+                        UserResponseDto.builder()
+                                .msg("본인의 글만 삭제 가능합니다")
+                                .statusCode(HttpStatus.BAD_REQUEST.value())
+                                .build()
+                );
 
-            boardRepository.delete(board);
+            }
+
+//            boardRepository.delete(board);
+            boardRepository.deleteById(id);
 
             return ResponseEntity.status(HttpStatus.OK).body(new UserResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
 

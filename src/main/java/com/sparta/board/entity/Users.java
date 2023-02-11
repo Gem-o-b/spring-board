@@ -23,8 +23,8 @@ public class Users {
     @Column(nullable = false)
     private String password;
 
-    @OneToMany
-    List<Board> boards = new ArrayList<>();
+   /* @OneToMany(mappedBy = "board" ,fetch = FetchType.EAGER)
+    List<Board> boards = new ArrayList<>();*/
 
 
     public Users(UserRequestDto userRequestDto) {
