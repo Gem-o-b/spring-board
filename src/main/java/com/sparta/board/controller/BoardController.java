@@ -6,6 +6,7 @@ import com.sparta.board.entity.Board;
 import com.sparta.board.dto.BoardRequestDto;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,9 +40,9 @@ public class BoardController {
         return boardService.updateBoard(id,boardRequestDto, request);
     }
     @DeleteMapping("api/post/{id}") // 삭제
-    public String deleteBoard2(@PathVariable Long id ,@RequestBody BoardRequestDto boardRequestDto){
+    public ResponseEntity<Object> deleteBoard(@PathVariable Long id , @RequestBody BoardRequestDto boardRequestDto , HttpServletRequest request){
 
-        return boardService.deleteBoard(id, boardRequestDto);
+        return boardService.deleteBoard(id, boardRequestDto,request);
 
 
     }

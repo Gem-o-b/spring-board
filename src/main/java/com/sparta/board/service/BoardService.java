@@ -2,6 +2,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.BoardAddResponseDto;
 import com.sparta.board.dto.BoardResponseDto;
+import com.sparta.board.dto.UserResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Users;
 import com.sparta.board.jwt.JwtUtil;
@@ -11,6 +12,8 @@ import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,16 +125,45 @@ public class BoardService {
     }
 
     @Transactional
-    public String deleteBoard(Long id, BoardRequestDto boardRequestDto) {
-        Board board = boardRepository.findById(id).orElseThrow(
+    public ResponseEntity<Object> deleteBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
+
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
+                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
+            );
+
+            boardRepository.delete(board);
+
+            return ResponseEntity.status(HttpStatus.OK).body(new UserResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
+
+        } else {
+            return null;
+        }
+
+       /* Board board = boardRepository.findById(id).orElseThrow(
                 ()-> new IllegalArgumentException("자료가 없습니다")
         );
-    /*    if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
+        if(!board.getPassword().equals(boardRequestDto.getPassword()) ){
             return "잘못된 패스워드 입니다";
         }
-*/
+
         boardRepository.delete(board);
-        return "삭제 완료";
+        return "삭제 완료";*/
 
     }
  /* @Transactional
