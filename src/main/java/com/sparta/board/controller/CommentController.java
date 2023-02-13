@@ -5,6 +5,7 @@ import com.sparta.board.dto.CommentRequestDto;
 import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,8 +32,8 @@ public class CommentController {
     }
 
     @DeleteMapping("/comment/{id}")
-    public void deleteComment(@PathVariable Long id){
-
+    public ResponseEntity<Object> deleteComment(@PathVariable Long id, HttpServletRequest request){
+        return commentService.deleteComment(id,request);
     }
 
 }

@@ -5,14 +5,14 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserResponseDto {
+public class ResultResponseDto {
 
 
     private String msg ;
     private int statusCode;
 
 
-    public UserResponseDto(String msg, int statusCode) {
+    public ResultResponseDto(String msg, int statusCode) {
         this.msg = msg;
         this.statusCode =  statusCode;
 

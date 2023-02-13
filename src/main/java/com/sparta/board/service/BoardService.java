@@ -9,16 +9,13 @@ import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,7 +168,7 @@ public class BoardService {
             if(user.getUserAuthority() == UserAuthority.ADMIN){
                 if (boardRepository.findById(id).isEmpty()){
                     return ResponseEntity.badRequest().body(
-                            UserResponseDto.builder()
+                            ResultResponseDto.builder()
                                     .msg("글이 존재하지 않습니다")
                                     .statusCode(HttpStatus.BAD_REQUEST.value())
                                     .build()
@@ -179,7 +176,7 @@ public class BoardService {
                 }else{
                     boardRepository.deleteById(id);
                     return ResponseEntity.status(HttpStatus.OK).body(
-                            UserResponseDto.builder()
+                            ResultResponseDto.builder()
                                     .msg("게시글 삭제 성공")
                                     .statusCode(HttpStatus.OK.value())
                                     .build()
@@ -192,7 +189,7 @@ public class BoardService {
 //                return ResponseEntity.badRequest().body(new UserResponseDto("본인의 글만 삭제 가능합니다",HttpStatus.BAD_REQUEST.value()));
                 //빌더패턴 적용
                 return ResponseEntity.badRequest().body( 
-                        UserResponseDto.builder()
+                        ResultResponseDto.builder()
                                 .msg("본인의 글만 삭제 가능합니다")
                                 .statusCode(HttpStatus.BAD_REQUEST.value())
                                 .build()
@@ -203,7 +200,7 @@ public class BoardService {
 //            boardRepository.delete(board);
             boardRepository.deleteById(id);
 
-            return ResponseEntity.status(HttpStatus.OK).body(new UserResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
+            return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
 
         } else {
             return null;

@@ -2,7 +2,7 @@ package com.sparta.board.service;
 
 
 import com.sparta.board.dto.UserRequestDto;
-import com.sparta.board.dto.UserResponseDto;
+import com.sparta.board.dto.ResultResponseDto;
 import com.sparta.board.entity.Users;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.UserRepository;
@@ -32,7 +32,7 @@ public class UserService {
             throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
         }
         userRepository.save(users);
-        return ResponseEntity.status(HttpStatus.OK).body(new UserResponseDto("회원가입 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("회원가입 성공",HttpStatus.OK.value()));
 
     }
 
@@ -49,7 +49,7 @@ public class UserService {
             throw  new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(users.getUsername()));
-        return ResponseEntity.status(HttpStatus.OK).body(new UserResponseDto("로그인 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("로그인 성공",HttpStatus.OK.value()));
     }
 
 }
