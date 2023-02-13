@@ -4,6 +4,7 @@ import com.sparta.board.dto.CommentRequestDto;
 import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
+import com.sparta.board.entity.UserAuthority;
 import com.sparta.board.entity.Users;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -27,7 +29,6 @@ public class CommentService {
 
     @Transactional
     public CommentResponseDto addComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
-
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
@@ -40,7 +41,6 @@ public class CommentService {
             } else {
                 throw new IllegalArgumentException("Token Error");
             }
-
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
             Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
                     () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
@@ -52,9 +52,49 @@ public class CommentService {
                 Board board = boardRepository.findById(id).get();
                 Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,user,board));
                 return new CommentResponseDto(comment);
-
             }
+        }
 
+        return null;
+
+    }
+    @Transactional
+    public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request){
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        if (token != null) {
+            // Token 검증
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+                throw new IllegalArgumentException("Token Error");
+            }
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+            );
+
+
+            if(user.getUserAuthority()== UserAuthority.ADMIN){
+                if (commentRepository.findById(id).isEmpty()){
+                    throw new IllegalArgumentException("글이 없습니다");
+                }else{
+                    Comment comment = commentRepository.findById(id).get();
+                    comment.update(commentRequestDto);
+                    return new CommentResponseDto(comment);
+                }
+
+            }else{
+                Comment comment = commentRepository.findByIdAndUsersId(id,user.getId());
+                if(comment == null){
+                    throw new IllegalArgumentException("글이 없습니다");
+                }else{
+                    comment.update(commentRequestDto);
+                    return new CommentResponseDto(comment);
+                }
+            }
         }
 
         return null;

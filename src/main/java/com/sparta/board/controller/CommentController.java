@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 @Controller
 @RequiredArgsConstructor
+@RequestMapping("api/")
 public class CommentController {
 
     private final CommentService commentService;
@@ -25,8 +26,8 @@ public class CommentController {
     }
 
     @PutMapping("/comment/{id}")
-    public void updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto ){
-
+    public CommentResponseDto updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request ){
+        return commentService.updateComment(id,commentRequestDto,request);
     }
 
     @DeleteMapping("/comment/{id}")
