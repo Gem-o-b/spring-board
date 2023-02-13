@@ -30,106 +30,114 @@ public class CommentService {
     private final BoardRepository boardRepository;
     private final JwtUtil jwtUtil;
 
-    @Transactional
-    public CommentResponseDto addComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
-        String token = jwtUtil.resolveToken(request);
-        Claims claims;
 
-        // 토큰이 있는 경우에만 관심상품 최저가 업데이트 가능
-        if (token != null) {
-            // Token 검증
-            if (jwtUtil.validateToken(token)) {
-                // 토큰에서 사용자 정보 가져오기
-                claims = jwtUtil.getUserInfoFromToken(token);
-            } else {
-                throw new IllegalArgumentException("Token Error");
-            }
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
-
-            if (boardRepository.findById(id).isEmpty()){
-                throw new IllegalArgumentException("해당 글이 없습니다");
-            }else {
-                Board board = boardRepository.findById(id).get();
-                Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,user,board));
-                return new CommentResponseDto(comment);
-            }
-        }
-
-        return null;
-
+    private ResponseEntity<Object> badRequest(String msg){
+        return ResponseEntity.badRequest().body(ResultResponseDto.builder()
+                .msg(msg)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build());
     }
     @Transactional
-    public CommentResponseDto updateComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request){
+    public ResponseEntity<?> addComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
         Claims claims;
-
         if (token != null) {
-            // Token 검증
             if (jwtUtil.validateToken(token)) {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다");
             }
+
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
 
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
 
-            if(user.getUserAuthority()== UserAuthority.ADMIN){
+            if (boardRepository.findById(id).isEmpty()){
+                return badRequest("해당 글이 없습니다");
+            }else {
+                Board board = boardRepository.findById(id).get();
+                Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,users,board));
+                return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
+            }
+        }
+        return badRequest("토큰이 유효하지 않습니다");
+    }
+    @Transactional
+    public ResponseEntity<?> updateComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request){
+        String token = jwtUtil.resolveToken(request);
+        Claims claims;
+
+        if (token != null) {
+            if (jwtUtil.validateToken(token)) {
+                // 토큰에서 사용자 정보 가져오기
+                claims = jwtUtil.getUserInfoFromToken(token);
+            } else {
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다2");
+            }
+
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
+
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
+
+            if(users.getUserAuthority()== UserAuthority.ADMIN){
                 if (commentRepository.findById(id).isEmpty()){
-                    throw new IllegalArgumentException("글이 없습니다");
+                    return badRequest("글이 없습니다");
                 }else{
                     Comment comment = commentRepository.findById(id).get();
                     comment.update(commentRequestDto);
-                    return new CommentResponseDto(comment);
+                    return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
+
                 }
 
             }else{
-                Comment comment = commentRepository.findByIdAndUsersId(id,user.getId());
+                Comment comment = commentRepository.findByIdAndUsersId(id,users.getId());
+                System.out.println(comment);
                 if(comment == null){
-                    throw new IllegalArgumentException("글이 없습니다");
+                    return badRequest("글이 없습니다");
                 }else{
                     comment.update(commentRequestDto);
-                    return new CommentResponseDto(comment);
+                    return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
                 }
             }
         }
 
-        return null;
+        return badRequest("토큰이 유효하지 않습니다1");
 
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteComment(Long id,HttpServletRequest request){
+    public ResponseEntity<?> deleteComment(Long id,HttpServletRequest request){
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
         if (token != null) {
-            // Token 검증
             if (jwtUtil.validateToken(token)) {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다");
             }
-            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
 
-            if(user.getUserAuthority() == UserAuthority.ADMIN){
+            // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
+
+            if(users.getUserAuthority() == UserAuthority.ADMIN){
                 if (commentRepository.findById(id).isEmpty()){
-                    return ResponseEntity.badRequest().body(
-                            ResultResponseDto.builder()
-                                    .msg("글이 없습니다")
-                                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                                    .build()
-                    );
+                    return badRequest("글이 없습니다");
                 }else {
                     commentRepository.deleteById(id);
                     return ResponseEntity.status(HttpStatus.OK).body(
@@ -141,14 +149,9 @@ public class CommentService {
                 }
 
             }else{
-                Comment comment = commentRepository.findByIdAndUsersId(id, user.getId());
+                Comment comment = commentRepository.findByIdAndUsersId(id, users.getId());
                 if (comment == null){
-                    return ResponseEntity.badRequest().body(
-                            ResultResponseDto.builder()
-                                    .msg("글이 없습니다")
-                                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                                    .build()
-                    );
+                    return badRequest("글이 없습니다");
                 }else{
                     commentRepository.deleteById(id);
                     return ResponseEntity.status(HttpStatus.OK).body(
@@ -161,6 +164,6 @@ public class CommentService {
             }
 
         }
-        return null;
+        return badRequest("토큰이 유효하지 않습니다");
     }
 }

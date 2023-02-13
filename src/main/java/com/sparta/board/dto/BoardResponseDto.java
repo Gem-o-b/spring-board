@@ -5,6 +5,7 @@ import com.sparta.board.entity.Comment;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Getter
@@ -27,6 +28,6 @@ public class BoardResponseDto {
         this.content = board.getContent();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-        this.commentList = board.getCommentList().stream().map(i-> new CommentResponseDto(i)).toList();
+        this.commentList = board.getCommentList().stream().map(i-> new CommentResponseDto(i)).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList();
     }
 }

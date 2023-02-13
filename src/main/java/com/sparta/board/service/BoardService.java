@@ -30,6 +30,13 @@ public class BoardService {
 
     private final JwtUtil jwtUtil;
 
+
+    private ResponseEntity<Object> badRequest(String msg){
+        return ResponseEntity.badRequest().body(ResultResponseDto.builder()
+                .msg(msg)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .build());
+    }
     @Transactional(readOnly = true)
     public List<BoardResponseDto> getBoard(){ // BoardResponseDto형식의 리스트로 리턴
         List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc(); // board리스트형으로 Repo에서 생성일 순으로 리턴
@@ -59,7 +66,7 @@ public class BoardService {
 
 
     @Transactional
-    public BoardAddResponseDto addBoard(BoardRequestDto boardRequestDto, HttpServletRequest request) {
+    public ResponseEntity<Object> addBoard(BoardRequestDto boardRequestDto, HttpServletRequest request) {
 
         String token = jwtUtil.resolveToken(request);
         Claims claims;
@@ -68,22 +75,29 @@ public class BoardService {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users users = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
 
+//            Users users = userRepository.findByUsername(claims.getSubject()).orElseThrow(
+//                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
+//            );
+
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
             // 요청받은 DTO 로 DB에 저장할 객체 만들기
             Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, users));
 
 //            return new ProductResponseDto(product);
-            return new BoardAddResponseDto(board);
+//            return new BoardAddResponseDto(board);
+            return ResponseEntity.status(HttpStatus.OK).body(new BoardAddResponseDto(board));
 
         } else {
-            return null;
+            return badRequest("토큰이 유효하지 않습니다");
         }
 
 //        Board board = new Board(boardRequestDto);
@@ -94,50 +108,55 @@ public class BoardService {
 
     }
     @Transactional
-    public BoardResponseDto updateBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
+    public ResponseEntity<Object> updateBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
         // Request에서 Token 가져오기
         String token = jwtUtil.resolveToken(request);
         Claims claims;
 
         // 토큰이 있는 경우에만 관심상품 최저가 업데이트 가능
         if (token != null) {
-            // Token 검증
             if (jwtUtil.validateToken(token)) {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
 
 //            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
 //            Board board = boardRepository.findByIdAndUsersId(id, user.getId()).orElseThrow(
 //                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
 //            );
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
 
-            if(user.getUserAuthority() == UserAuthority.ADMIN){
+            if(users.getUserAuthority() == UserAuthority.ADMIN){
                 if (boardRepository.findById(id).isEmpty()){
-                    throw new IllegalArgumentException("글이 존재하지 않습니다1");
+                    return badRequest("글이 존재하지 않습니다");
                 }else{
                     Board board = boardRepository.findById(id).get();
                     board.update(boardRequestDto);
-                    return new BoardResponseDto(board);
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            new BoardAddResponseDto(board)
+                    );
                 }
             }else{
-                Board board = boardRepository.findByIdAndUsersId(id, user.getId());
+                Board board = boardRepository.findByIdAndUsersId(id, users.getId());
                 if (board == null){
-                    throw new IllegalArgumentException("글이 존재하지 않습니다2");
+                    return badRequest("글이 존재하지 않습니다");
                 }
                 board.update(boardRequestDto);
-                return new BoardResponseDto(board);
+                return ResponseEntity.status(HttpStatus.OK).body(
+                        new BoardAddResponseDto(board)
+                );
             }
 
         } else {
-            return null;
+            return badRequest("토큰이 유효하지 않습니다");
         }
 
 //
@@ -151,36 +170,33 @@ public class BoardService {
     }
 
     @Transactional
-    public ResponseEntity<Object> deleteBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
+    public ResponseEntity<?> deleteBoard(Long id, BoardRequestDto boardRequestDto , HttpServletRequest request) {
 
         String token = jwtUtil.resolveToken(request);
         Claims claims;
         if (token != null) {
-            // Token 검증
             if (jwtUtil.validateToken(token)) {
                 // 토큰에서 사용자 정보 가져오기
                 claims = jwtUtil.getUserInfoFromToken(token);
             } else {
-                throw new IllegalArgumentException("Token Error");
+//                throw new IllegalArgumentException("Token Error");
+                return badRequest("토큰이 유효하지 않습니다");
             }
 
             // 토큰에서 가져온 사용자 정보를 사용하여 DB 조회
-            Users user = userRepository.findByUsername(claims.getSubject()).orElseThrow(
-                    () -> new IllegalArgumentException("사용자가 존재하지 않습니다.")
-            );
+            if (userRepository.findByUsername(claims.getSubject()).isEmpty()){
+                return badRequest("사용자가 없습니다");
+            }
+
 
 //            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
 //                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
 //            );
 //            Optional<Board> board = boardRepository.findByIdAndUsersId(id, user.getId());
-            if(user.getUserAuthority() == UserAuthority.ADMIN){
+            Users users = userRepository.findByUsername(claims.getSubject()).get();
+            if(users.getUserAuthority() == UserAuthority.ADMIN){
                 if (boardRepository.findById(id).isEmpty()){
-                    return ResponseEntity.badRequest().body(
-                            ResultResponseDto.builder()
-                                    .msg("글이 존재하지 않습니다")
-                                    .statusCode(HttpStatus.BAD_REQUEST.value())
-                                    .build()
-                    );
+                    return badRequest("글이 존재하지 않습니다");
                 }else{
                     boardRepository.deleteById(id);
                     return ResponseEntity.status(HttpStatus.OK).body(
@@ -192,16 +208,11 @@ public class BoardService {
                 }
             }
 
-            Board board = boardRepository.findByIdAndUsersId(id, user.getId());
+            Board board = boardRepository.findByIdAndUsersId(id, users.getId());
             if(board == null){
 //                return ResponseEntity.badRequest().body(new UserResponseDto("본인의 글만 삭제 가능합니다",HttpStatus.BAD_REQUEST.value()));
                 //빌더패턴 적용
-                return ResponseEntity.badRequest().body( 
-                        ResultResponseDto.builder()
-                                .msg("본인의 글만 삭제 가능합니다")
-                                .statusCode(HttpStatus.BAD_REQUEST.value())
-                                .build()
-                );
+                return badRequest("본인의 글만 삭제 가능합니다");
 
             }
 
@@ -211,7 +222,7 @@ public class BoardService {
             return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
 
         } else {
-            return null;
+            return badRequest("토큰이 유효하지 않습니다");
         }
 
        /* Board board = boardRepository.findById(id).orElseThrow(

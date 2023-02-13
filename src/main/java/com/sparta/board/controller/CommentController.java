@@ -20,19 +20,19 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping("/comment/{id}")
-    public CommentResponseDto addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request){
+    public ResponseEntity<?> addComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request){
 
         return commentService.addComment(id, commentRequestDto,request);
 
     }
 
     @PutMapping("/comment/{id}")
-    public CommentResponseDto updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request ){
+    public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody CommentRequestDto commentRequestDto, HttpServletRequest request ){
         return commentService.updateComment(id,commentRequestDto,request);
     }
 
     @DeleteMapping("/comment/{id}")
-    public ResponseEntity<Object> deleteComment(@PathVariable Long id, HttpServletRequest request){
+    public ResponseEntity<?> deleteComment(@PathVariable Long id, HttpServletRequest request){
         return commentService.deleteComment(id,request);
     }
 

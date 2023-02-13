@@ -19,7 +19,7 @@ public class BoardController {
 
     private final BoardService boardService;
     @PostMapping("/api/post") // 추가
-    public BoardAddResponseDto addBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
+    public ResponseEntity<Object> addBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
 
         return boardService.addBoard(boardRequestDto,request);
 
@@ -36,11 +36,11 @@ public class BoardController {
     }
 
     @PutMapping("api/post/{id}") // 수정
-    public BoardResponseDto updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
+    public ResponseEntity<Object> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
         return boardService.updateBoard(id,boardRequestDto, request);
     }
     @DeleteMapping("api/post/{id}") // 삭제
-    public ResponseEntity<Object> deleteBoard(@PathVariable Long id , @RequestBody BoardRequestDto boardRequestDto , HttpServletRequest request){
+    public ResponseEntity<?> deleteBoard(@PathVariable Long id , @RequestBody BoardRequestDto boardRequestDto , HttpServletRequest request){
 
         return boardService.deleteBoard(id, boardRequestDto,request);
 
