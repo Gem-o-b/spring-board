@@ -2,6 +2,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.*;
 import com.sparta.board.entity.Board;
+import com.sparta.board.entity.UserAuthority;
 import com.sparta.board.entity.Users;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
@@ -109,13 +110,26 @@ public class BoardService {
             );
 
 //            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
-            Board board = boardRepository.findByIdAndUsersId(id, user.getId()).orElseThrow(
-                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
-            );
+//            Board board = boardRepository.findByIdAndUsersId(id, user.getId()).orElseThrow(
+//                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
+//            );
 
-            board.update(boardRequestDto);
-
-            return new BoardResponseDto(board);
+            if(user.getUserAuthority() == UserAuthority.ADMIN){
+                if (boardRepository.findById(id).isEmpty()){
+                    throw new IllegalArgumentException("글이 존재하지 않습니다1");
+                }else{
+                    Board board = boardRepository.findById(id).get();
+                    board.update(boardRequestDto);
+                    return new BoardResponseDto(board);
+                }
+            }else{
+                Board board = boardRepository.findByIdAndUsersId(id, user.getId());
+                if (board == null){
+                    throw new IllegalArgumentException("글이 존재하지 않습니다2");
+                }
+                board.update(boardRequestDto);
+                return new BoardResponseDto(board);
+            }
 
         } else {
             return null;
@@ -153,8 +167,28 @@ public class BoardService {
 //            Board board = boardRepository.findByIdAndUserName(id, user.getUsername()).orElseThrow(
 //                    () -> new NullPointerException("해당 글은 존재하지 않습니다.")
 //            );
-            Optional<Board> board = boardRepository.findByIdAndUsersId(id, user.getId());
-            if(board.isEmpty()){
+//            Optional<Board> board = boardRepository.findByIdAndUsersId(id, user.getId());
+            if(user.getUserAuthority() == UserAuthority.ADMIN){
+                if (boardRepository.findById(id).isEmpty()){
+                    return ResponseEntity.badRequest().body(
+                            UserResponseDto.builder()
+                                    .msg("글이 존재하지 않습니다")
+                                    .statusCode(HttpStatus.BAD_REQUEST.value())
+                                    .build()
+                    );
+                }else{
+                    boardRepository.deleteById(id);
+                    return ResponseEntity.status(HttpStatus.OK).body(
+                            UserResponseDto.builder()
+                                    .msg("게시글 삭제 성공")
+                                    .statusCode(HttpStatus.OK.value())
+                                    .build()
+                    );
+                }
+            }
+
+            Board board = boardRepository.findByIdAndUsersId(id, user.getId());
+            if(board == null){
 //                return ResponseEntity.badRequest().body(new UserResponseDto("본인의 글만 삭제 가능합니다",HttpStatus.BAD_REQUEST.value()));
                 //빌더패턴 적용
                 return ResponseEntity.badRequest().body( 
