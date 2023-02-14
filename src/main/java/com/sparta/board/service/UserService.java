@@ -28,6 +28,8 @@ public class UserService {
                 .statusCode(HttpStatus.BAD_REQUEST.value())
                 .build());
     }
+
+
     @Transactional
     public ResponseEntity<Object> addMember(UserRequestDto userRequestDto) {
         Users users = new Users(userRequestDto);

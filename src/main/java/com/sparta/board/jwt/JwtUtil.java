@@ -28,7 +28,7 @@ public class JwtUtil {
     @Value("${jwt.secret.key}")
     private String secretKey;
     private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256; // 해시알고리즘 256으로 만듬 키값이 얼마나되든
 
     @PostConstruct
     public void init() {
@@ -51,10 +51,10 @@ public class JwtUtil {
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(username)
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME))
+                        .setSubject(username) // 토큰안에 정보넣어준것 없어도됨 누구나 decode 가능 base 64
+                        .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // serialized 객체를 통일해서 보내야함 2진수로 바꿈 (low level)
                         .setIssuedAt(date)
-                        .signWith(key, signatureAlgorithm)
+                        .signWith(key, signatureAlgorithm) // signature - 내가 발행한 유효한 토큰인지 확인 단방향 암호
                         .compact();
     }
 

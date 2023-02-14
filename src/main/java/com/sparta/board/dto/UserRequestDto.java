@@ -16,7 +16,7 @@ public class UserRequestDto {
 
     @NotBlank
     @Size(min = 8, max = 15)
-    @Pattern(regexp="^(?=.*[A-za-z])(?=.*\\d)[A-Za-z\\d]{8,15}$",message = "8~15자리 영문대소문자, 숫자로 입력해주세요")
+    @Pattern(regexp="^[a-zA-Z0-9~!@#$%^&*()_+=?,./<>{}\\\\[\\\\]\\\\-]{8,15}$",message = "8~15자리 영문대소문자, 숫자로 입력해주세요")
     private String password;
 
 

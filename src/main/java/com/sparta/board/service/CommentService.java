@@ -40,7 +40,7 @@ public class CommentService {
     @Transactional
     public ResponseEntity<?> addComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request) {
         String token = jwtUtil.resolveToken(request);
-        Claims claims;
+        Claims claims; // JWT 구성요소 꼭 필요하진 않음 payload안에 담겨있는 데이터
         if (token != null) {
             if (jwtUtil.validateToken(token)) {
                 // 토큰에서 사용자 정보 가져오기
@@ -66,7 +66,7 @@ public class CommentService {
                 return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
             }
         }
-        return badRequest("토큰이 유효하지 않습니다");
+        return badRequest("토큰이 유효하지 않습니다"); // 마지막 리턴은 성공으로. 위에서부터 큰 케이스로 걸러낼것.
     }
     @Transactional
     public ResponseEntity<?> updateComment(Long id, CommentRequestDto commentRequestDto, HttpServletRequest request){
