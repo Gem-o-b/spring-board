@@ -26,8 +26,6 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-
     private final JwtUtil jwtUtil;
 
 
