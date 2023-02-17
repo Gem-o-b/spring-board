@@ -9,6 +9,7 @@ import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final PasswordEncoder passwordEncoder;
 
     private ResponseEntity<Object> badRequest(String msg){
         return ResponseEntity.badRequest().body(ResultResponseDto.builder()
@@ -32,7 +34,11 @@ public class UserService {
 
     @Transactional
     public ResponseEntity<Object> addMember(UserRequestDto userRequestDto) {
-        Users users = new Users(userRequestDto);
+        String userID = userRequestDto.getUsername();
+        String userPW = passwordEncoder.encode(userRequestDto.getPassword());
+        boolean userAuthority = userRequestDto.isIsadmin();
+
+        Users users = new Users(userID,userPW,userAuthority);
         Optional<Users> rst = userRepository.findByUsername(userRequestDto.getUsername());
 
         if (rst.isPresent()){
@@ -53,7 +59,8 @@ public class UserService {
             return badRequest("등록된 사용자가 없습니다");
         }
         Users users = userRepository.findByUsername(username).get();
-        if(!users.getPassword().equals(password)){
+//        if(!users.getPassword().equals(password)){
+        if(!passwordEncoder.matches(password, users.getPassword())){
             return badRequest("비밀번호가 일치하지 않습니다.");
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(users.getUsername()));

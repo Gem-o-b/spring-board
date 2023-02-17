@@ -32,11 +32,10 @@ public class Users {
 
 
 
-    public Users(UserRequestDto userRequestDto) {
-        this.username = userRequestDto.getUsername();
-        this.password = userRequestDto.getPassword();
-        System.out.println(userRequestDto.isIsadmin());
-        if(userRequestDto.isIsadmin()==true){
+    public Users(String userName,String userPassword, boolean isadmin) {
+        this.username = userName;
+        this.password = userPassword;
+        if(isadmin==true){
             this.userAuthority = UserAuthority.ADMIN;
         }else{
             this.userAuthority = UserAuthority.USER;

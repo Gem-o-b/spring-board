@@ -4,9 +4,11 @@ import com.sparta.board.dto.BoardAddResponseDto;
 import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.entity.Board;
 import com.sparta.board.dto.BoardRequestDto;
+import com.sparta.board.security.UserDetailsImpl;
 import com.sparta.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,9 +21,9 @@ public class BoardController {
 
     private final BoardService boardService;
     @PostMapping("/api/post") // 추가
-    public ResponseEntity<Object> addBoard(@RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
+    public ResponseEntity<Object> addBoard(@RequestBody BoardRequestDto boardRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        return boardService.addBoard(boardRequestDto,request);
+        return boardService.addBoard(boardRequestDto,userDetails.getUser());
 
     }
 
@@ -36,13 +38,13 @@ public class BoardController {
     }
 
     @PutMapping("api/post/{id}") // 수정
-    public ResponseEntity<Object> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto, HttpServletRequest request){
-        return boardService.updateBoard(id,boardRequestDto, request);
+    public ResponseEntity<Object> updateBoard(@PathVariable Long id, @RequestBody BoardRequestDto boardRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
+        return boardService.updateBoard(id,boardRequestDto, userDetails.getUser());
     }
     @DeleteMapping("api/post/{id}") // 삭제
-    public ResponseEntity<?> deleteBoard(@PathVariable Long id , @RequestBody BoardRequestDto boardRequestDto , HttpServletRequest request){
+    public ResponseEntity<?> deleteBoard(@PathVariable Long id , @AuthenticationPrincipal UserDetailsImpl userDetails){
 
-        return boardService.deleteBoard(id, boardRequestDto,request);
+        return boardService.deleteBoard(id,userDetails.getUser());
 
 
     }
