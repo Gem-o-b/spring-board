@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.catalina.User;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -26,6 +28,10 @@ public class Comment extends Timestamped {
     @ManyToOne
     @JoinColumn(name ="board_id")
     private Board board;
+
+    @OneToMany(mappedBy = "comment")
+    @Column
+    private List<Likes> likesList = new ArrayList<>();
 
 
     public Comment(CommentRequestDto commentRequestDto, Users users, Board board){

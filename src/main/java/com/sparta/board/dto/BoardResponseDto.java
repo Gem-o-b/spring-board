@@ -19,6 +19,7 @@ public class BoardResponseDto {
 
     private List<CommentResponseDto> commentList;
 
+    private int likesCount;
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
@@ -31,5 +32,7 @@ public class BoardResponseDto {
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
         this.commentList = board.getCommentList().stream().map(i-> new CommentResponseDto(i)).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList(); //수정해보기
+        this.likesCount = (int)board.getLikes().stream().count();
+
     }
 }

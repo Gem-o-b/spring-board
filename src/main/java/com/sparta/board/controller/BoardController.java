@@ -20,6 +20,7 @@ import java.util.List;
 public class BoardController {
 
     private final BoardService boardService;
+
     @PostMapping("/api/post") // 추가
     public ResponseEntity<Object> addBoard(@RequestBody BoardRequestDto boardRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails){
 

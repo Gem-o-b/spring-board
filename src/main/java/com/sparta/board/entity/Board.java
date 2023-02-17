@@ -36,6 +36,8 @@ public class Board extends Timestamped{
     @OneToMany(mappedBy = "board", cascade =CascadeType.REMOVE )
     private List<Comment> commentList = new ArrayList<>(); // 배열이 초기화가 안되어있으면 NullPointException 떨어짐
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
+    List<Likes> likes = new ArrayList<>();
 
     public Board(BoardRequestDto boardRequestDto,Users users) {
         this.title = boardRequestDto.getTitle();

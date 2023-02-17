@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Slf4j
+@Slf4j // lombok 라이브러리에서 제공하는 어노테이션으로 로깅을 위한 코드를 쉽게 작성할 수 있도록 해준다.
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -29,17 +29,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String token = jwtUtil.resolveToken(request);
 
         if(token != null) {
-            if(!jwtUtil.validateToken(token)){
+            if(!jwtUtil.validateToken(token)){ // JWT 토큰이 올바르지 않으면 예외를 처리를한다
                 jwtExceptionHandler(response, "Token Error", HttpStatus.UNAUTHORIZED.value());
                 return;
             }
-            Claims info = jwtUtil.getUserInfoFromToken(token);
-            setAuthentication(info.getSubject());
+            Claims info = jwtUtil.getUserInfoFromToken(token); //  JWT 토큰으로부터 추출한 사용자 정보를 Claims 객체로 반환한다
+            setAuthentication(info.getSubject()); // Security Context와 Authentication 객체를 생성한다
         }
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request,response); // 필터 체인의 다음 필터를 실행한다
     }
 
-    public void setAuthentication(String username) {
+    public void setAuthentication(String username) { // Context와 Authentication 객체를 생성하는 메소드
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.createAuthentication(username);
         context.setAuthentication(authentication);
@@ -47,7 +47,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
     }
 
-    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) {
+    public void jwtExceptionHandler(HttpServletResponse response, String msg, int statusCode) { // 예외 발생시 처리하는 메서드
         response.setStatus(statusCode);
         response.setContentType("application/json");
         try {

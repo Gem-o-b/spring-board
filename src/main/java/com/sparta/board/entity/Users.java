@@ -30,6 +30,8 @@ public class Users {
    /* @OneToMany(mappedBy = "board" ,fetch = FetchType.EAGER)
     List<Board> boards = new ArrayList<>();*/
 
+    @OneToMany(mappedBy = "users")
+    List<Likes> likes = new ArrayList<>();
 
 
     public Users(String userName,String userPassword, boolean isadmin) {
