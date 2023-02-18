@@ -4,15 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
+
 public class ResultResponseDto {
 
 
-    private String msg ;
+
     private int statusCode;
+    private String msg ;
 
-
-    public ResultResponseDto(String msg, int statusCode) {
+    @Builder
+    public ResultResponseDto( String msg,int statusCode) {
         this.msg = msg;
         this.statusCode =  statusCode;
 
