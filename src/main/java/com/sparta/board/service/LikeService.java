@@ -23,6 +23,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
+
     @Transactional
     public ResponseEntity<?> likeBoard(Long id, Users user) {
 
@@ -46,6 +47,7 @@ public class LikeService {
     }
 
     public ResponseEntity<?> likeComment(Long id, Users user) {
+
         Optional<Likes> likes = likeRepository.findByComment_IdAndUsers_Id(id, user.getId());
 
         if(likes.isPresent()){
@@ -53,7 +55,7 @@ public class LikeService {
             return ResponseEntity.ok().body(new ResultResponseDto("좋아요 삭제", HttpStatus.OK.value()));
         }
 
-        if (!boardRepository.findById(id).isEmpty()) {
+        if (!commentRepository.findById(id).isEmpty()) {
             Comment comment = commentRepository.findById(id).get();
             likeRepository.saveAndFlush(new Likes(null,user,comment));
             return ResponseEntity.ok().body(new ResultResponseDto("좋아요 추가", HttpStatus.OK.value()));

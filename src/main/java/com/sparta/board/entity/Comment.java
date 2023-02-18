@@ -29,7 +29,7 @@ public class Comment extends Timestamped {
     @JoinColumn(name ="board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "comment")
+    @OneToMany(mappedBy = "comment",cascade = CascadeType.REMOVE)
     @Column
     private List<Likes> likesList = new ArrayList<>();
 
