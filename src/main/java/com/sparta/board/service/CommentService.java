@@ -3,10 +3,8 @@ package com.sparta.board.service;
 import com.sparta.board.dto.CommentRequestDto;
 import com.sparta.board.dto.CommentResponseDto;
 import com.sparta.board.dto.ResultResponseDto;
-import com.sparta.board.entity.Board;
-import com.sparta.board.entity.Comment;
-import com.sparta.board.entity.UserAuthority;
-import com.sparta.board.entity.Users;
+import com.sparta.board.entity.*;
+import com.sparta.board.exception.CustomException;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
 import com.sparta.board.repository.CommentRepository;
@@ -31,18 +29,13 @@ public class CommentService {
     private final JwtUtil jwtUtil;
 
 
-    private ResponseEntity<Object> badRequest(String msg){
-        return ResponseEntity.badRequest().body(ResultResponseDto.builder()
-                .msg(msg)
-                .statusCode(HttpStatus.BAD_REQUEST.value())
-                .build());
-    }
+
     @Transactional
     public ResponseEntity<?> addComment(Long id, CommentRequestDto commentRequestDto,Users users) {
 
 
             if (boardRepository.findById(id).isEmpty()){
-                return badRequest("해당 글이 없습니다");
+                throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
             }
                 Board board = boardRepository.findById(id).get();
                 Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,users,board));
@@ -53,7 +46,7 @@ public class CommentService {
     public ResponseEntity<?> updateComment(Long id, CommentRequestDto commentRequestDto, Users users) {
 
         if (commentRepository.findById(id).isEmpty()) {
-            return badRequest("글이 없습니다");
+            throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
         }
         if (users.getUserAuthority() == UserAuthority.ADMIN) {
 
@@ -65,7 +58,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndUsersId(id, users.getId());
         System.out.println(comment);
         if (comment == null) {
-            return badRequest("글이 없습니다");
+            throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_MODIFY);
         }
         comment.update(commentRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
@@ -75,7 +68,7 @@ public class CommentService {
     public ResponseEntity<?> deleteComment(Long id, Users users) {
 
         if (commentRepository.findById(id).isEmpty()) {
-            return badRequest("글이 없습니다");
+            throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
         }
         if (users.getUserAuthority() == UserAuthority.ADMIN) {
             commentRepository.deleteById(id);
@@ -88,7 +81,7 @@ public class CommentService {
         }
         Comment comment = commentRepository.findByIdAndUsersId(id, users.getId());
         if (comment == null) {
-            return badRequest("글이 없습니다");
+            throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
         }
         commentRepository.deleteById(id);
         return ResponseEntity.status(HttpStatus.OK).body(
