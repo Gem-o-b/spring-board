@@ -13,14 +13,6 @@ public enum ExceptionEnum {
     NOT_EXIST_USER(400,"사용자가 없습니다"),
     DUPLICATE_USER(400,"중복된 사용자 입니다");
 
-
-
-
-
-
-
-
-    ;
     private final int code;
     private final String msg;
 

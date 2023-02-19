@@ -114,7 +114,7 @@ public class BoardService {
 
             Board board = boardRepository.findByIdAndUsersId(id, users.getId());
             if(board == null){
-                throw new CustomException(ExceptionEnum.NOT_MY_CONTENT);
+                throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
             }
             boardRepository.deleteById(id);
             return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
