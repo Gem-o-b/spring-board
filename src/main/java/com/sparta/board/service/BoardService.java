@@ -58,66 +58,58 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<Object> addBoard(BoardRequestDto boardRequestDto, Users user) {
-
-
-
             Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, user));
-
-
             return ResponseEntity.status(HttpStatus.OK).body(new BoardAddResponseDto(board));
 
     }
     @Transactional
-    public ResponseEntity<Object> updateBoard(Long id, BoardRequestDto boardRequestDto , Users users) {
-
-            if(users.getUserAuthority() == UserAuthority.ADMIN){
-                if (boardRepository.findById(id).isEmpty()){
-                    throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
-                }else{
-                    Board board = boardRepository.findById(id).get();
-                    board.update(boardRequestDto);
-                    return ResponseEntity.status(HttpStatus.OK).body(
-                            new BoardAddResponseDto(board)
-                    );
-                }
-            }else{
-                Board board = boardRepository.findByIdAndUsersId(id, users.getId());
-                if (board == null){
-                    throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
-                }
-                board.update(boardRequestDto);
-                return ResponseEntity.status(HttpStatus.OK).body(
-                        new BoardAddResponseDto(board)
-                );
-            }
-
-
+    public ResponseEntity<Object> updateBoard(Long id, BoardRequestDto boardRequestDto, Users users) {
+        if (boardRepository.findById(id).isEmpty()) {
+            throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
         }
+
+        if (users.getUserAuthority() == UserAuthority.ADMIN) {
+            Board board = boardRepository.findById(id).get();
+            board.update(boardRequestDto);
+            boardRepository.flush();
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    new BoardAddResponseDto(board)
+            );
+        }
+
+        Board board = boardRepository.findByIdAndUsersId(id, users.getId());
+        if (board == null) {
+            throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
+        }
+        board.update(boardRequestDto);
+        boardRepository.flush();
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new BoardAddResponseDto(board)
+        );
+    }
 
 
     @Transactional
     public ResponseEntity<?> deleteBoard(Long id, Users users) {
-
-            if(users.getUserAuthority() == UserAuthority.ADMIN){
-                if (boardRepository.findById(id).isEmpty()){
-                    throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
-                }else{
-                    boardRepository.deleteById(id);
-                    return ResponseEntity.status(HttpStatus.OK).body(
-                            ResultResponseDto.builder()
-                                    .msg("게시글 삭제 성공")
-                                    .statusCode(HttpStatus.OK.value())
-                                    .build()
-                    );
-                }
-            }
-
-            Board board = boardRepository.findByIdAndUsersId(id, users.getId());
-            if(board == null){
-                throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
-            }
-            boardRepository.deleteById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공",HttpStatus.OK.value()));
-
+        if (boardRepository.findById(id).isEmpty()) {
+            throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
         }
+        if (users.getUserAuthority() == UserAuthority.ADMIN) {
+            boardRepository.deleteById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(
+                    ResultResponseDto.builder()
+                            .msg("게시글 삭제 성공")
+                            .statusCode(HttpStatus.OK.value())
+                            .build()
+            );
+        }
+
+        Board board = boardRepository.findByIdAndUsersId(id, users.getId());
+        if (board == null) {
+            throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
+        }
+        boardRepository.deleteById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공", HttpStatus.OK.value()));
+
+    }
 }
