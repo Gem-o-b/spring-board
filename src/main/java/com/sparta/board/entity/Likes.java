@@ -2,6 +2,8 @@ package com.sparta.board.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 
@@ -18,6 +20,7 @@ public class Likes {
     Board board;
 
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Users users;
 
     @ManyToOne

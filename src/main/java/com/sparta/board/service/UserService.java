@@ -3,10 +3,15 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.UserRequestDto;
 import com.sparta.board.dto.ResultResponseDto;
+import com.sparta.board.entity.Board;
+import com.sparta.board.entity.Comment;
 import com.sparta.board.entity.ExceptionEnum;
 import com.sparta.board.entity.Users;
 import com.sparta.board.exception.CustomException;
 import com.sparta.board.jwt.JwtUtil;
+import com.sparta.board.repository.BoardRepository;
+import com.sparta.board.repository.CommentRepository;
+import com.sparta.board.repository.LikeRepository;
 import com.sparta.board.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +29,9 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final BoardRepository boardRepository;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
 
@@ -63,5 +72,37 @@ public class UserService {
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(users.getUsername()));
         return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("로그인 성공",HttpStatus.OK.value()));
     }
+    @Transactional
+    public ResponseEntity<Object> userWithdraw(UserRequestDto userRequestDto,Users users) {
 
+        String password = userRequestDto.getPassword();
+
+        if (!passwordEncoder.matches(password, users.getPassword())) {
+            throw new CustomException(ExceptionEnum.PASSWORD_WRONG);
+        }
+
+
+        List<Board> boardList = boardRepository.findByUsersId(users.getId());
+        for(Board board : boardList){
+            List<Comment> commentListBoard = commentRepository.findByBoard_Id(board.getId());
+            for (Comment comment : commentListBoard){
+                likeRepository.deleteByComment_Id(comment.getId());
+                commentRepository.delete(comment);
+            }
+            List<Comment> commentListUser = commentRepository.findByUsersId(users.getId());
+            for (Comment comment : commentListUser){
+                likeRepository.deleteByComment_Id(comment.getId());
+                commentRepository.delete(comment);
+            }
+
+            boardRepository.delete(board);
+        }
+        userRepository.delete(users);
+
+
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.builder()
+                .msg("삭제 완료")
+                .statusCode(HttpStatus.OK.value())
+                .build());
+    }
 }
