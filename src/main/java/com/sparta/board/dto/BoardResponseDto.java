@@ -2,6 +2,7 @@ package com.sparta.board.dto;
 
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +25,8 @@ public class BoardResponseDto {
 
     private LocalDateTime modifiedAt;
 
-    public BoardResponseDto(Board board,List<CommentResponseDto> commentList) {
+    @Builder
+    private BoardResponseDto(Board board,List<CommentResponseDto> commentList) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.userName = board.getUsers().getUsername();
@@ -36,5 +38,12 @@ public class BoardResponseDto {
 
     }
 
+    public static BoardResponseDto from(Board board,List<CommentResponseDto> commentList){
+        return BoardResponseDto.builder()
+                .board(board)
+                .commentList(commentList)
+                .build();
+
+    }
 
 }

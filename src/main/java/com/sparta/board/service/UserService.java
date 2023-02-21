@@ -50,7 +50,7 @@ public class UserService {
             throw new CustomException(ExceptionEnum.DUPLICATE_USER);
         }
         userRepository.save(users);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("회원가입 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.from("회원가입 성공",HttpStatus.OK.value()));
 
     }
 
@@ -70,7 +70,7 @@ public class UserService {
             throw new CustomException(ExceptionEnum.PASSWORD_WRONG);
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(users.getUsername()));
-        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("로그인 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.from("로그인 성공",HttpStatus.OK.value()));
     }
     @Transactional
     public ResponseEntity<Object> userWithdraw(UserRequestDto userRequestDto,Users users) {

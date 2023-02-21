@@ -32,13 +32,13 @@ public class LikeService {
 
         if(likes.isPresent()){
             likeRepository.delete(likes.get());
-            return ResponseEntity.ok().body(new ResultResponseDto("좋아요 삭제", HttpStatus.OK.value()));
+            return ResponseEntity.ok().body(ResultResponseDto.from("좋아요 삭제", HttpStatus.OK.value()));
         }
 
 
         Board board = boardRepository.findById(id).get();
         likeRepository.saveAndFlush(Likes.of(board,user));
-        return ResponseEntity.ok().body(new ResultResponseDto("좋아요 추가", HttpStatus.OK.value()));
+        return ResponseEntity.ok().body(ResultResponseDto.from("좋아요 추가", HttpStatus.OK.value()));
 
 
 //        likeRepository.findByBoard_IdAndUsers_Id(id, user.getId());
@@ -52,13 +52,13 @@ public class LikeService {
 
         if(likes.isPresent()){
             likeRepository.delete(likes.get());
-            return ResponseEntity.ok().body(new ResultResponseDto("좋아요 삭제", HttpStatus.OK.value()));
+            return ResponseEntity.ok().body(ResultResponseDto.from("좋아요 삭제", HttpStatus.OK.value()));
         }
 
 
         Comment comment = commentRepository.findById(id).get();
         likeRepository.saveAndFlush(Likes.of(comment,user));
-        return ResponseEntity.ok().body(new ResultResponseDto("좋아요 추가", HttpStatus.OK.value()));
+        return ResponseEntity.ok().body(ResultResponseDto.from("좋아요 추가", HttpStatus.OK.value()));
 
     }
 }
