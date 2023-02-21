@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -35,8 +36,8 @@ public class BoardController {
     }
     @Operation(summary = "전체조회 메서드", description = "전체 조회 메서드 입니다.")
     @GetMapping("api/posts") // 전체 조회
-    public List<BoardResponseDto> getBoard(){
-        return boardService.getBoard();
+    public List<BoardResponseDto> getBoard(Pageable pageable){
+        return boardService.getBoard(pageable);
     }
 
     @Operation(summary = "특정 글 조회 메서드", description = "특정 글 조회 메서드 입니다.")
