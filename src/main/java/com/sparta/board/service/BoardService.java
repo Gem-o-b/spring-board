@@ -9,6 +9,7 @@ import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,10 @@ public class BoardService {
 
     @Transactional(readOnly = true)
     public List<BoardResponseDto> getBoard(Pageable pageable){ // BoardResponseDto형식의 리스트로 리턴
-        List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc(pageable); // board리스트형으로 Repo에서 생성일 순으로 리턴
+        Page<Board> boardPage = boardRepository.findAll(pageable);
+        List<Board> board = boardPage.getContent();
+
+//        List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc(pageable); // board리스트형으로 Repo에서 생성일 순으로 리턴
 
         List<BoardResponseDto> boardResponseDtos = new ArrayList<>(); // Stream으로 안할경우
 
