@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.UserRequestDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.catalina.User;
@@ -31,15 +32,19 @@ public class Users {
     List<Board> boards = new ArrayList<>();*/
 
 
-
-    public Users(String userName,String userPassword, boolean isadmin) {
+    @Builder
+    private Users(String userName,String userPassword, UserAuthority userAuthority) {
         this.username = userName;
         this.password = userPassword;
-        if(isadmin==true){
-            this.userAuthority = UserAuthority.ADMIN;
-        }else{
-            this.userAuthority = UserAuthority.USER;
-        }
+        this.userAuthority = userAuthority;
+    }
+
+    public static Users of(String userName,String userPassword, UserAuthority userAuthority){
+        return Users.builder()
+                .userName(userName)
+                .userPassword(userPassword)
+                .userAuthority(userAuthority)
+                .build();
     }
 
 

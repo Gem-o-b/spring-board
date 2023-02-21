@@ -38,8 +38,8 @@ public class CommentService {
                 throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
             }
                 Board board = boardRepository.findById(id).get();
-                Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,users,board));
-                return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
+                Comment comment = commentRepository.saveAndFlush(Comment.of(commentRequestDto,users,board));
+                return ResponseEntity.status(HttpStatus.OK).body(CommentResponseDto.from(comment));
 
     }
     @Transactional
@@ -52,7 +52,7 @@ public class CommentService {
 
             Comment comment = commentRepository.findById(id).get();
             comment.update(commentRequestDto);
-            return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
+            return ResponseEntity.status(HttpStatus.OK).body(CommentResponseDto.from(comment));
 
         }
         Comment comment = commentRepository.findByIdAndUsersId(id, users.getId());
@@ -61,7 +61,7 @@ public class CommentService {
             throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_MODIFY);
         }
         comment.update(commentRequestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
+        return ResponseEntity.status(HttpStatus.OK).body(CommentResponseDto.from(comment));
     }
 
     @Transactional

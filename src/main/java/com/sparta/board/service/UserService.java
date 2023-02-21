@@ -3,10 +3,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.UserRequestDto;
 import com.sparta.board.dto.ResultResponseDto;
-import com.sparta.board.entity.Board;
-import com.sparta.board.entity.Comment;
-import com.sparta.board.entity.ExceptionEnum;
-import com.sparta.board.entity.Users;
+import com.sparta.board.entity.*;
 import com.sparta.board.exception.CustomException;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
@@ -41,16 +38,19 @@ public class UserService {
     public ResponseEntity<Object> addMember(UserRequestDto userRequestDto) {
         String userID = userRequestDto.getUsername();
         String userPW = passwordEncoder.encode(userRequestDto.getPassword());
-        boolean userAuthority = userRequestDto.isIsadmin();
+        UserAuthority userAuthority = UserAuthority.USER;
+        if ( userRequestDto.isIsadmin()){
+            userAuthority = UserAuthority.ADMIN;
+        }
 
-        Users users = new Users(userID,userPW,userAuthority);
+        Users users = Users.of(userID,userPW,userAuthority);
         Optional<Users> rst = userRepository.findByUsername(userRequestDto.getUsername());
 
         if (rst.isPresent()){
             throw new CustomException(ExceptionEnum.DUPLICATE_USER);
         }
         userRepository.save(users);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("회원가입 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.from("회원가입 성공",HttpStatus.OK.value()));
 
     }
 
@@ -70,7 +70,7 @@ public class UserService {
             throw new CustomException(ExceptionEnum.PASSWORD_WRONG);
         }
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, jwtUtil.createToken(users.getUsername()));
-        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("로그인 성공",HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.from("로그인 성공",HttpStatus.OK.value()));
     }
     @Transactional
     public ResponseEntity<Object> userWithdraw(UserRequestDto userRequestDto,Users users) {

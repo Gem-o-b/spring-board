@@ -2,6 +2,7 @@ package com.sparta.board.dto;
 
 import com.sparta.board.entity.Board;
 import com.sparta.board.entity.Comment;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,15 +25,25 @@ public class BoardResponseDto {
 
     private LocalDateTime modifiedAt;
 
-    public BoardResponseDto(Board board) {
+    @Builder
+    private BoardResponseDto(Board board,List<CommentResponseDto> commentList) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.userName = board.getUsers().getUsername();
         this.content = board.getContent();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-        this.commentList = board.getCommentList().stream().map(i-> new CommentResponseDto(i)).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList(); //수정해보기
+        this.commentList =  commentList;
         this.likesCount = (int)board.getLikes().stream().count();
 
     }
+
+    public static BoardResponseDto from(Board board,List<CommentResponseDto> commentList){
+        return BoardResponseDto.builder()
+                .board(board)
+                .commentList(commentList)
+                .build();
+
+    }
+
 }

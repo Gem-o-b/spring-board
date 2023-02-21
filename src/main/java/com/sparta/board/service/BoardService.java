@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +34,16 @@ public class BoardService {
     public List<BoardResponseDto> getBoard(){ // BoardResponseDto형식의 리스트로 리턴
         List<Board> board = boardRepository.findAllByOrderByCreatedAtDesc(); // board리스트형으로 Repo에서 생성일 순으로 리턴
 
-     /*   List<BoardResponseDto> boardResponseDtos = new ArrayList<>(); // Stream으로 안할경우
+        List<BoardResponseDto> boardResponseDtos = new ArrayList<>(); // Stream으로 안할경우
 
         for(Board boards : board){
-            boardResponseDtos.add(new BoardResponseDto(boards));
-        }*/
+            List<CommentResponseDto> commentList = boards.getCommentList().stream().map(CommentResponseDto::from).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList();
+            boardResponseDtos.add(BoardResponseDto.from(boards,commentList));
+        }
 
-        List<BoardResponseDto> boardResponseDtos = board.stream() //Board형의 리스트를 boardResponseDto형으로 변경하기 위해 Stream사용
+      /*  List<BoardResponseDto> boardResponseDtos = board.stream() //Board형의 리스트를 boardResponseDto형으로 변경하기 위해 Stream사용
                 .map(BoardResponseDto::new)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList());*/
 
 
         return boardResponseDtos ;
@@ -49,17 +52,19 @@ public class BoardService {
     public BoardResponseDto getIdBoard(Long id) { // BoardResponseDto형식의 리스트로 리턴
         Board board = boardRepository.findById(id).orElseThrow(()-> new IllegalArgumentException("해당 글이 없습니다")); //findId를 했을때 아이디값이 있으면 board로 리턴 아닐경우 경고 리턴
 
-//        List<Comment> commentList = commentRepository.findByBoard_IdOOrderByIdAsc(board.getId());
+        List<CommentResponseDto> commentList = board.getCommentList().stream().map(CommentResponseDto::from).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList();
 
 
-        return new BoardResponseDto(board); // Board형으로 받은 값을 BoardResponseDto형으로 변환
+
+
+        return BoardResponseDto.from(board,commentList); // Board형으로 받은 값을 BoardResponseDto형으로 변환
     }
 
 
     @Transactional
     public ResponseEntity<Object> addBoard(BoardRequestDto boardRequestDto, Users user) {
-            Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, user));
-            return ResponseEntity.status(HttpStatus.OK).body(new BoardAddResponseDto(board));
+            Board board = boardRepository.saveAndFlush(Board.of(boardRequestDto, user));
+            return ResponseEntity.status(HttpStatus.OK).body(BoardAddResponseDto.from(board));
 
     }
     @Transactional
@@ -73,7 +78,7 @@ public class BoardService {
             board.update(boardRequestDto);
             boardRepository.flush();
             return ResponseEntity.status(HttpStatus.OK).body(
-                    new BoardAddResponseDto(board)
+                    BoardAddResponseDto.from(board)
             );
         }
 
@@ -84,7 +89,7 @@ public class BoardService {
         board.update(boardRequestDto);
         boardRepository.flush();
         return ResponseEntity.status(HttpStatus.OK).body(
-                new BoardAddResponseDto(board)
+                BoardAddResponseDto.from(board)
         );
     }
 
@@ -109,7 +114,7 @@ public class BoardService {
             throw new CustomException(ExceptionEnum.NOT_MY_CONTENT_DELETE);
         }
         boardRepository.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(new ResultResponseDto("게시글 삭제 성공", HttpStatus.OK.value()));
+        return ResponseEntity.status(HttpStatus.OK).body(ResultResponseDto.from("게시글 삭제 성공", HttpStatus.OK.value()));
 
     }
 }

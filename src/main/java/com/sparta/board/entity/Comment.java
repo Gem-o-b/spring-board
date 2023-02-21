@@ -1,6 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.CommentRequestDto;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,8 @@ public class Comment extends Timestamped {
     private List<Likes> likesList = new ArrayList<>();
 
 
-    public Comment(CommentRequestDto commentRequestDto, Users users, Board board){
+    @Builder
+    private Comment(CommentRequestDto commentRequestDto, Users users, Board board){
         this.content = commentRequestDto.getContent();
         this.users = users;
         this.board = board;
@@ -45,4 +47,11 @@ public class Comment extends Timestamped {
         this.content = commentRequestDto.getContent();
     }
 
+    public static Comment of (CommentRequestDto commentRequestDto, Users users, Board board){
+        return Comment.builder()
+                .commentRequestDto(commentRequestDto)
+                .users(users)
+                .board(board)
+                .build();
+    }
 }

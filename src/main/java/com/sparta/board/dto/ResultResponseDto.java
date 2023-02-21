@@ -13,9 +13,17 @@ public class ResultResponseDto {
     private String msg ;
 
     @Builder
-    public ResultResponseDto( String msg,int statusCode) {
+    private ResultResponseDto( String msg,int statusCode) {
         this.msg = msg;
         this.statusCode =  statusCode;
 
     }
+
+    public static ResultResponseDto from(String msg,int statusCode){
+        return ResultResponseDto.builder()
+                .msg(msg)
+                .statusCode(statusCode)
+                .build();
+    }
+
 }
