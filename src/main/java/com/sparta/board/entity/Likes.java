@@ -1,5 +1,6 @@
 package com.sparta.board.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.OnDelete;
@@ -26,9 +27,25 @@ public class Likes {
     @ManyToOne
     Comment comment;
 
-    public Likes(Board board, Users users, Comment comment) {
+    @Builder
+    private Likes(Board board, Users users, Comment comment) {
         this.board = board;
         this.users = users;
         this.comment = comment;
     }
+
+    public static Likes of(Board board, Users users){
+        return Likes.builder()
+                .board(board)
+                .users(users)
+                .build();
+    }
+
+    public static Likes of(Comment comment, Users users){
+        return Likes.builder()
+                .comment(comment)
+                .users(users)
+                .build();
+    }
+
 }

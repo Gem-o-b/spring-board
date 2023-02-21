@@ -37,7 +37,7 @@ public class LikeService {
 
 
         Board board = boardRepository.findById(id).get();
-        likeRepository.saveAndFlush(new Likes(board,user,null));
+        likeRepository.saveAndFlush(Likes.of(board,user));
         return ResponseEntity.ok().body(new ResultResponseDto("좋아요 추가", HttpStatus.OK.value()));
 
 
@@ -57,7 +57,7 @@ public class LikeService {
 
 
         Comment comment = commentRepository.findById(id).get();
-        likeRepository.saveAndFlush(new Likes(null,user,comment));
+        likeRepository.saveAndFlush(Likes.of(comment,user));
         return ResponseEntity.ok().body(new ResultResponseDto("좋아요 추가", HttpStatus.OK.value()));
 
     }

@@ -3,10 +3,7 @@ package com.sparta.board.service;
 
 import com.sparta.board.dto.UserRequestDto;
 import com.sparta.board.dto.ResultResponseDto;
-import com.sparta.board.entity.Board;
-import com.sparta.board.entity.Comment;
-import com.sparta.board.entity.ExceptionEnum;
-import com.sparta.board.entity.Users;
+import com.sparta.board.entity.*;
 import com.sparta.board.exception.CustomException;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
@@ -41,9 +38,12 @@ public class UserService {
     public ResponseEntity<Object> addMember(UserRequestDto userRequestDto) {
         String userID = userRequestDto.getUsername();
         String userPW = passwordEncoder.encode(userRequestDto.getPassword());
-        boolean userAuthority = userRequestDto.isIsadmin();
+        UserAuthority userAuthority = UserAuthority.USER;
+        if ( userRequestDto.isIsadmin()){
+            userAuthority = UserAuthority.ADMIN;
+        }
 
-        Users users = new Users(userID,userPW,userAuthority);
+        Users users = Users.of(userID,userPW,userAuthority);
         Optional<Users> rst = userRepository.findByUsername(userRequestDto.getUsername());
 
         if (rst.isPresent()){

@@ -38,7 +38,7 @@ public class CommentService {
                 throw new CustomException(ExceptionEnum.NOT_EXIST_BOARD);
             }
                 Board board = boardRepository.findById(id).get();
-                Comment comment = commentRepository.saveAndFlush(new Comment(commentRequestDto,users,board));
+                Comment comment = commentRepository.saveAndFlush(Comment.of(commentRequestDto,users,board));
                 return ResponseEntity.status(HttpStatus.OK).body(new CommentResponseDto(comment));
 
     }

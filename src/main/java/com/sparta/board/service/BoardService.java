@@ -58,7 +58,7 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<Object> addBoard(BoardRequestDto boardRequestDto, Users user) {
-            Board board = boardRepository.saveAndFlush(new Board(boardRequestDto, user));
+            Board board = boardRepository.saveAndFlush(Board.of(boardRequestDto, user));
             return ResponseEntity.status(HttpStatus.OK).body(new BoardAddResponseDto(board));
 
     }

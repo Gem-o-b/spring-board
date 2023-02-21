@@ -1,10 +1,7 @@
 package com.sparta.board.entity;
 
 import com.sparta.board.dto.BoardRequestDto;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -41,15 +38,23 @@ public class Board extends Timestamped{
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     List<Likes> likes = new ArrayList<>();
 
-    public Board(BoardRequestDto boardRequestDto,Users users) {
+    @Builder
+    private Board(BoardRequestDto boardRequestDto,Users users) {
         this.title = boardRequestDto.getTitle();
         this.content = boardRequestDto.getContent();
-//        this.password = boardRequestDto.getPassword();
         this.users = users;
     }
 
     public void update(BoardRequestDto boardRequestDto) {
         this.title = boardRequestDto.getTitle();
         this.content = boardRequestDto.getContent();
+    }
+
+    public static Board of(BoardRequestDto boardRequestDto, Users user){
+        return Board.builder()
+                .boardRequestDto(boardRequestDto)
+                .users(user)
+                .build();
+
     }
 }
