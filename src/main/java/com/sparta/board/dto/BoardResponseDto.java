@@ -24,15 +24,17 @@ public class BoardResponseDto {
 
     private LocalDateTime modifiedAt;
 
-    public BoardResponseDto(Board board) {
+    public BoardResponseDto(Board board,List<CommentResponseDto> commentList) {
         this.id = board.getId();
         this.title = board.getTitle();
         this.userName = board.getUsers().getUsername();
         this.content = board.getContent();
         this.createdAt = board.getCreatedAt();
         this.modifiedAt = board.getModifiedAt();
-        this.commentList = board.getCommentList().stream().map(i-> new CommentResponseDto(i)).sorted(Comparator.comparing(CommentResponseDto::getCreateAt).reversed()).toList(); //수정해보기
+        this.commentList =  commentList;
         this.likesCount = (int)board.getLikes().stream().count();
 
     }
+
+
 }
