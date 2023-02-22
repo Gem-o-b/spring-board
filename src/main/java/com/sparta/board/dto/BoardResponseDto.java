@@ -21,6 +21,7 @@ public class BoardResponseDto {
     private List<CommentResponseDto> commentList;
 
     private int likesCount;
+    private String category;
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;
@@ -35,6 +36,8 @@ public class BoardResponseDto {
         this.modifiedAt = board.getModifiedAt();
         this.commentList =  commentList;
         this.likesCount = (int)board.getLikes().stream().count();
+        this.category = board.getCategory().getTitle();
+
 
     }
 

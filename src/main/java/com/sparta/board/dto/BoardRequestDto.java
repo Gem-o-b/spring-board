@@ -8,6 +8,8 @@ public class BoardRequestDto {
 
     private String content;
 
+    private Long category;
+
 
 
 }

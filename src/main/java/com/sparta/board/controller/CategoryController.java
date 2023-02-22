@@ -1,6 +1,7 @@
 package com.sparta.board.controller;
 
 
+import com.sparta.board.dto.BoardResponseDto;
 import com.sparta.board.dto.CategoryRequestDto;
 import com.sparta.board.dto.CategoryResponseDto;
 import com.sparta.board.dto.ResultResponseDto;
@@ -53,6 +54,14 @@ public class CategoryController {
     public ResponseEntity<ResultResponseDto> categoryUpdate(@PathVariable Long id){
 
         return categoryService.categoryDelete(id);
+
+    }
+
+    @Operation(summary = "카테고리별 게시글 메서드", description = "카테고리별 게시글 조회 메서드 입니다.")
+    @GetMapping("/post/{id}")
+    public List<BoardResponseDto> categoryGetId(@PathVariable Long id){
+
+        return categoryService.categoryGetId(id);
 
     }
 
