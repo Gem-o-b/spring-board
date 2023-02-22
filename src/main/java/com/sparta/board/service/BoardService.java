@@ -5,6 +5,7 @@ import com.sparta.board.entity.*;
 import com.sparta.board.exception.CustomException;
 import com.sparta.board.jwt.JwtUtil;
 import com.sparta.board.repository.BoardRepository;
+import com.sparta.board.repository.CategoryRepository;
 import com.sparta.board.repository.CommentRepository;
 import com.sparta.board.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -27,8 +28,8 @@ import java.util.stream.Collectors;
 public class BoardService {
 
     private final BoardRepository boardRepository;
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
+    private final CategoryRepository categoryRepository;
+
 
 
 
@@ -68,7 +69,11 @@ public class BoardService {
 
     @Transactional
     public ResponseEntity<Object> addBoard(BoardRequestDto boardRequestDto, Users user) {
-            Board board = boardRepository.saveAndFlush(Board.of(boardRequestDto, user));
+        if (categoryRepository.findById(boardRequestDto.getCategory()).isEmpty()){
+            throw new CustomException(ExceptionEnum.NOT_EXIST_CATEGORY);
+        }
+            Category category = categoryRepository.findById(boardRequestDto.getCategory()).get();
+            Board board = boardRepository.saveAndFlush(Board.of(boardRequestDto, user,category));
             return ResponseEntity.status(HttpStatus.OK).body(BoardAddResponseDto.from(board));
 
     }

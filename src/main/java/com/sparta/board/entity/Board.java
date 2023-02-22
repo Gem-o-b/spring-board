@@ -38,11 +38,15 @@ public class Board extends Timestamped{
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     List<Likes> likes = new ArrayList<>();
 
+    @ManyToOne
+    private Category category;
+
     @Builder
-    private Board(BoardRequestDto boardRequestDto,Users users) {
+    private Board(BoardRequestDto boardRequestDto,Users users,Category category) {
         this.title = boardRequestDto.getTitle();
         this.content = boardRequestDto.getContent();
         this.users = users;
+        this.category = category;
     }
 
     public void update(BoardRequestDto boardRequestDto) {
@@ -50,9 +54,10 @@ public class Board extends Timestamped{
         this.content = boardRequestDto.getContent();
     }
 
-    public static Board of(BoardRequestDto boardRequestDto, Users user){
+    public static Board of(BoardRequestDto boardRequestDto, Users user,Category category){
         return Board.builder()
                 .boardRequestDto(boardRequestDto)
+                .category(category)
                 .users(user)
                 .build();
 
